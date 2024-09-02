@@ -2,7 +2,6 @@ package com.golfGame.GameDormieBuy.course.service;
 
 import com.golfGame.GameDormieBuy.course.model.Course;
 import com.golfGame.GameDormieBuy.course.model.GameDormieBuyAmountDto;
-import com.golfGame.GameDormieBuy.course.model.GameMode;
 import com.golfGame.GameDormieBuy.course.model.web.CalculateRequest;
 import com.golfGame.GameDormieBuy.course.model.web.CalculateResponse;
 import com.golfGame.GameDormieBuy.course.model.web.CreateCourseRequest;
@@ -43,11 +42,10 @@ public class CourseService implements CourseServiceImpl {
 
     public CalculateResponse calculate(CalculateRequest calculateRequest) {
         CalculateResponse response = new CalculateResponse();
-
         int[][] strokeMatrix = preprocessStroke(calculateRequest.strokes);
-        CalculateResponse output = calculateScore(calculateRequest.getPlayerScores(), calculateRequest.coursePar, calculateRequest.courseIndex, calculateRequest.gameMode, calculateRequest.gameAmount, strokeMatrix);
+        CalculateResponse output = calculateScore(calculateRequest.getPlayerScores(), calculateRequest.coursePar,
+                calculateRequest.courseIndex, calculateRequest.gameAmount, strokeMatrix);
         response.setResult(output.result);
-        // Calculate the course
         return response;
     }
 
@@ -57,23 +55,24 @@ public class CourseService implements CourseServiceImpl {
         int i = 0;
         for (List<Integer> strokeList : strokes.values()) {
             for (int j = 0; j < numPlayers; j++) {
-                strokeMatrix[i][j] = strokeList.get(j);
+                if (strokeList.get(j) == null) {
+                    strokeMatrix[i][j] = 0;
+                }
+                else {
+                    strokeMatrix[i][j] = strokeList.get(j);
+                }
             }
             i += 1;
         }
         return strokeMatrix;
-
     }
 
-    private static CalculateResponse calculateScore(HashMap<String, List<Integer>> playerScores, List<Integer> par, List<Integer> index, int gameMode, GameDormieBuyAmountDto gameDormieBuyAmount, int[][] strokes) {
+    private static CalculateResponse calculateScore(HashMap<String, List<Integer>> playerScores, List<Integer> par,
+                                                    List<Integer> index, GameDormieBuyAmountDto gameDormieBuyAmount,
+                                                    int[][] strokes) {
         List<HashMap<String, Integer>> results = new ArrayList<>();
-
-
         int gameAmount = gameDormieBuyAmount.GameAmount;
-
-//        int numHoles = (gameMode == 9) ? 9 : 18;
-        int numHoles = 9;
-
+        int numHoles = index.size();
         List<String> players = new ArrayList<>(playerScores.keySet());
 
         for (int i = 0; i < players.size(); i++) {
@@ -86,23 +85,22 @@ public class CourseService implements CourseServiceImpl {
                 int winCount = 0;
                 int strokeAdvantages = strokes[i][j];
                 for (int hole = 0; hole < numHoles; hole++) {
-
                     int scoreA = playerScores.get(playerA).get(hole);
                     int scoreB = playerScores.get(playerB).get(hole);
                     int dormie = numHoles - hole + 1;
                     int currentIndex = index.get(hole);
-                    int extraStrokes = strokeAdvantageCalculation(numHoles, strokeAdvantages, currentIndex);
-                    boolean dormieInPlay = false;
-                    // case receive strokes
-                    if (strokeAdvantages > 0) {
+                    int extraStrokes = 0;
+                    if (strokeAdvantages != 0) {
+                        extraStrokes = strokeAdvantageCalculation(numHoles, strokeAdvantages, currentIndex);
+                    }
 
+                    boolean dormieInPlay = false;
+                    if (strokeAdvantages > 0) {
                         scoreB += extraStrokes;
                     }
-                    // case give strokes
                     else {
                         scoreA += extraStrokes;
                     }
-
                     // Dormie in play
                     if (Math.abs(winCount) == dormie && !dormieInPlay) {
                         gameAmount = gameDormieBuyAmount.DormieAmount;
@@ -148,7 +146,7 @@ public class CourseService implements CourseServiceImpl {
         int remaining = absStokeAdvantage % numHoles;
         if (currentIndex <= absStokeAdvantage) {
             extraStrokes += additionalStroke;
-            if (remaining > 0 && remaining <= currentIndex) {
+            if (remaining > 0 && currentIndex <= remaining) {
                 extraStrokes += 1;
             }
         }
