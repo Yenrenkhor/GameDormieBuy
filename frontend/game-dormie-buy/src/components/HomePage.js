@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CourseDropdown from './course/CourseDropdown';
-import PlayerStrokes from './PlayerStrokes';
+import PlayerStrokes from './player/PlayerStrokes';
 
 function HomePage() {
   const [players, setPlayers] = useState([]);
@@ -13,6 +13,7 @@ function HomePage() {
   const [dormieAmount, setDormieAmount] = useState(0);
   const [buyAmount, setBuyAmount] = useState(0);
   const [response, setResponse] = useState([]);
+  const api_url = process.env.REACT_APP_API_URL
 
   useEffect(() => {
     if (selectedCourse) {
@@ -25,7 +26,7 @@ function HomePage() {
   }
 
   function fetchCourseDetails(courseName) {
-    fetch(`http://localhost:8080/api/v1/course?courseName=${encodeURIComponent(courseName)}`)
+    fetch(`${api_url}/api/v1/course?courseName=${encodeURIComponent(courseName)}`)
       .then(response => {
         console.log('Response status:', response.status); // Debug logging
         if (response.ok) {
@@ -106,7 +107,7 @@ function HomePage() {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/calculate', {
+      const response = await fetch(`${api_url}/api/v1/calculate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +168,11 @@ function HomePage() {
         <button onClick={addPlayer} className="button">Add Player</button>
       </div>
       {players.length > 0 && (
-        <PlayerStrokes players={players} handleStrokesChange={handleStrokesChange} />
+        <>
+          <h3>Stroke Advantages</h3>
+          <PlayerStrokes players={players} handleStrokesChange={handleStrokesChange} />
+        </>
+        
       )}
       <h2>Score Table</h2>
       <table className="score-table">
@@ -230,7 +235,6 @@ function HomePage() {
           <h2>Calculation Results:</h2>
           {response.map((holeResult, holeIndex) => (
             <div key={holeIndex}>
-              <h3>Hole {holeIndex + 1}</h3>
               <ul>
                 {Object.entries(holeResult).map(([player, score]) => (
                   <li key={player}>{player}: {score}</li>
