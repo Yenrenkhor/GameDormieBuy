@@ -26,7 +26,7 @@ function HomePage() {
   }
 
   function fetchCourseDetails(courseName) {
-    fetch(`${api_url}/api/v1/course?courseName=${encodeURIComponent(courseName)}`)
+    fetch(`https://gamedormiebuy.onrender.com/api/v1/course?courseName=${encodeURIComponent(courseName)}`)
       .then(response => {
         console.log('Response status:', response.status); // Debug logging
         if (response.ok) {
@@ -107,7 +107,7 @@ function HomePage() {
     };
 
     try {
-      const response = await fetch(`${api_url}/api/v1/calculate`, {
+      const response = await fetch('https://gamedormiebuy.onrender.com/api/v1/calculate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
