@@ -3,13 +3,14 @@ import React, { useState, useEffect } from 'react';
 function CourseDropdown({ onSelect }) {
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState('');
+  let api_url = process.env.REACT_APP_API_URL
 
   useEffect(() => {
     fetchCourseNames();
   }, []);
 
   function fetchCourseNames() {
-    fetch('http://localhost:8080/api/v1/course/all')
+    fetch(`${api_url}/api/v1/course/all`)
       .then(response => {
         console.log('Response status:', response.status); // Debug logging
         if (response.ok) {

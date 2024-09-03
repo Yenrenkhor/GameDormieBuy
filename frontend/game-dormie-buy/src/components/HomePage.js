@@ -13,7 +13,9 @@ function HomePage() {
   const [dormieAmount, setDormieAmount] = useState(0);
   const [buyAmount, setBuyAmount] = useState(0);
   const [response, setResponse] = useState([]);
-  const api_url = process.env.REACT_APP_API_URL
+  let api_url = process.env.REACT_APP_API_URL
+
+  console.log(api_url)
 
   useEffect(() => {
     if (selectedCourse) {
@@ -26,7 +28,8 @@ function HomePage() {
   }
 
   function fetchCourseDetails(courseName) {
-    fetch(`https://gamedormiebuy.onrender.com/api/v1/course?courseName=${encodeURIComponent(courseName)}`)
+    console.log(`Getting data from ${api_url}/api/v1/course?courseName=${encodeURIComponent(courseName)}`)
+    fetch(`${api_url}/api/v1/course?courseName=${encodeURIComponent(courseName)}`)
       .then(response => {
         console.log('Response status:', response.status); // Debug logging
         if (response.ok) {
@@ -107,7 +110,7 @@ function HomePage() {
     };
 
     try {
-      const response = await fetch('https://gamedormiebuy.onrender.com/api/v1/calculate', {
+      const response = await fetch(`${api_url}/api/v1/calculate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
