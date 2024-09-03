@@ -218,7 +218,7 @@ function HomePage() {
                 <td key={holeIndex}>
                   <input
                     type="number"
-                    value=''
+                    value={score ? score : ''}
                     onChange={(e) => handleScoreChange(playerIndex, holeIndex, e.target.value)}
                     className="score-input"
                   />
